@@ -14,11 +14,12 @@ import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
 import org.slf4j.Logger;
 
-// The value here should match an entry in the META-INF/mods.toml file
-@Mod(BerdlyHTTP.MODID)
+@Mod(BerdlyHTTP.MOD_ID)
 public final class BerdlyHTTP {
-    public static final String MODID = "berdlyHttp";
+    public static final String MOD_ID = "berdlyHttp";
     private static final Logger LOGGER = LogUtils.getLogger();
+
+    private static final String API_URL = "berdsmp.quantumkya.dev/somewhere";
 
     public BerdlyHTTP() {
         IEventBus modEventBus = FMLJavaModLoadingContext.get().getModEventBus();
@@ -36,29 +37,21 @@ public final class BerdlyHTTP {
     public void onBlockUpdate(BlockEvent.NeighborNotifyEvent event) {
         Level level = (Level) event.getLevel();
 
-        // Ensure this logic only runs on the Server side, not the Client side
-        if (!level.isClientSide()) {
-            BlockPos pos = event.getPos();
+        // logic only runs server-side because the server has the frickin plugin
+        if (level.isClientSide()) return;
 
-            // 1. Check if the block receiving power is your target block type
-            // (Replace 'DETECTOR_RAIL' with whatever block you are using)
-            if (level.getBlockState(pos).is(net.minecraft.world.level.block.Blocks.DETECTOR_RAIL)) {
+        BlockPos pos = event.getPos();
+        if (level.getBlockState(pos).is(ModBlocks.DIMENSIONAL_TRANSMITTER.get())) {
 
-                // 2. Check if the block is currently receiving redstone power
-                if (level.getBestNeighborSignal(pos) > 0) {
-                    LOGGER.info("Custom redstone block activated! Sending HTTP request command...");
+            if (level.getBestNeighborSignal(pos) > 0) LOGGER.info("Dimensional transmitter activated! Sending data...");
+            else return;
 
-                    // 3. Get the server instance and execute the plugin's command
-                    MinecraftServer server = level.getServer();
-                    if (server != null) {
-                        String targetUrl = "https://example.com";
+            MinecraftServer server = level.getServer();
+            if (server == null) return;
 
-                        // This executes the command exactly as if it were typed in the server console
-                        String command = "httprequest " + targetUrl;
-                        server.getCommands().performPrefixedCommand(server.createCommandSourceStack(), command);
-                    }
-                }
-            }
+            // execute command
+            String command = "httprequest " + API_URL;
+            server.getCommands().performPrefixedCommand(server.createCommandSourceStack(), command);
         }
     }
 }

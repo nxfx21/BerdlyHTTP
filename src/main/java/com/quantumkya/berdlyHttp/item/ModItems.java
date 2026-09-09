@@ -8,7 +8,7 @@ import net.minecraftforge.registries.ForgeRegistries;
 
 public class ModItems {
     public static final DeferredRegister<Item> ITEMS =
-            DeferredRegister.create(ForgeRegistries.ITEMS, BerdlyHTTP.MODID);
+            DeferredRegister.create(ForgeRegistries.ITEMS, BerdlyHTTP.MOD_ID);
 
     public static void register(IEventBus eventBus) {
         ITEMS.register(eventBus);

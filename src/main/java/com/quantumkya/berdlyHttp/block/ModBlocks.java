@@ -17,7 +17,7 @@ import java.util.function.Supplier;
 
 public class ModBlocks {
     public static final DeferredRegister<Block> BLOCKS =
-            DeferredRegister.create(ForgeRegistries.BLOCKS, BerdlyHTTP.MODID);
+            DeferredRegister.create(ForgeRegistries.BLOCKS, BerdlyHTTP.MOD_ID);
 
     public static final RegistryObject<Block> DIMENSIONAL_TRANSMITTER = registerBlock("dimensional_transmitter",
             () -> new Block(BlockBehaviour.Properties.copy(Blocks.IRON_BLOCK).sound(SoundType.AMETHYST)));
