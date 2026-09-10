@@ -3,7 +3,7 @@
 	"credit": "Made with Blockbench",
 	"texture_size": [64, 64],
 	"textures": {
-		"0": "berdlyhttp:block/dimensional_transmitter/normal",
+		"0": "berdlyhttp:block/dimensional_transmitter/active",
 		"1": "berdlyhttp:block/dimensional_transmitter/active",
 		"particle": "berdlyhttp:block/dimensional_transmitter/normal"
 	},
