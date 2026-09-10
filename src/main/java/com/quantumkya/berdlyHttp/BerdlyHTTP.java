@@ -21,8 +21,8 @@ public final class BerdlyHTTP {
 
     private static final String API_URL = "berdsmp.quantumkya.dev/somewhere";
 
-    public BerdlyHTTP() {
-        IEventBus modEventBus = FMLJavaModLoadingContext.get().getModEventBus();
+    public BerdlyHTTP(FMLJavaModLoadingContext context) {
+        IEventBus modEventBus = context.getModEventBus();
 
         LOGGER.info("Initializing BerdlyHTTP...");
 
