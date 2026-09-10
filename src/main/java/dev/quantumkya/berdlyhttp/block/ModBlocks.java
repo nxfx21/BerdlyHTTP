@@ -1,7 +1,7 @@
-package com.quantumkya.berdlyHttp.block;
+package dev.quantumkya.berdlyhttp.block;
 
-import com.quantumkya.berdlyHttp.BerdlyHTTP;
-import com.quantumkya.berdlyHttp.item.ModItems;
+import dev.quantumkya.berdlyhttp.BerdlyHTTP;
+import dev.quantumkya.berdlyhttp.item.ModItems;
 import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.level.block.Block;

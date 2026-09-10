@@ -1,6 +1,6 @@
-package com.quantumkya.berdlyHttp.item;
+package dev.quantumkya.berdlyhttp.item;
 
-import com.quantumkya.berdlyHttp.BerdlyHTTP;
+import dev.quantumkya.berdlyhttp.BerdlyHTTP;
 import net.minecraft.world.item.Item;
 import net.minecraftforge.eventbus.api.IEventBus;
 import net.minecraftforge.registries.DeferredRegister;

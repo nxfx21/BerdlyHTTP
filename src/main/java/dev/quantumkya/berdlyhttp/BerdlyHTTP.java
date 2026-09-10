@@ -1,8 +1,8 @@
-package com.quantumkya.berdlyHttp;
+package dev.quantumkya.berdlyhttp;
 
 import com.mojang.logging.LogUtils;
-import com.quantumkya.berdlyHttp.block.ModBlocks;
-import com.quantumkya.berdlyHttp.item.ModItems;
+import dev.quantumkya.berdlyhttp.block.ModBlocks;
+import dev.quantumkya.berdlyhttp.item.ModItems;
 import net.minecraft.core.BlockPos;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.world.level.Level;
@@ -16,7 +16,7 @@ import org.slf4j.Logger;
 
 @Mod(BerdlyHTTP.MOD_ID)
 public final class BerdlyHTTP {
-    public static final String MOD_ID = "berdlyHttp";
+    public static final String MOD_ID = "berdlyhttp";
     private static final Logger LOGGER = LogUtils.getLogger();
 
     private static final String API_URL = "berdsmp.quantumkya.dev/somewhere";
