@@ -1,8 +1,10 @@
 package dev.quantumkya.berdlyhttp.block;
 
+import com.google.gson.JsonObject;
 import dev.quantumkya.berdlyhttp.BerdlyConfig;
 import dev.quantumkya.berdlyhttp.BerdlyHTTP;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.GlobalPos;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockState;
@@ -18,12 +20,10 @@ import java.time.Duration;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
-// Future survival crafting recipe idea:
-// [Redstone, Amethyst Shards, Iron Ingot, Ender Pearl]
 public class DimensionalTransmitterBlock extends Block {
     public static final BooleanProperty POWERED = BlockStateProperties.POWERED;
 
-    private static final Map<BlockPos, Long> LAST_TRIGGER = new ConcurrentHashMap<>();
+    private static final Map<GlobalPos, Long> LAST_TRIGGER = new ConcurrentHashMap<>();
 
     private static final HttpClient HTTP_CLIENT = HttpClient.newBuilder()
             .connectTimeout(Duration.ofSeconds(5))
@@ -49,11 +49,12 @@ public class DimensionalTransmitterBlock extends Block {
         if (hasSignal != isPowered) {
             if (hasSignal) {
                 long now = level.getGameTime();
-                Long last = LAST_TRIGGER.get(pos);
+                GlobalPos globalPos = GlobalPos.of(level.dimension(), pos);
+                Long last = LAST_TRIGGER.get(globalPos);
                 int cooldown = BerdlyConfig.COOLDOWN_TICKS.get();
 
                 if (last == null || now - last >= cooldown) {
-                    LAST_TRIGGER.put(pos, now);
+                    LAST_TRIGGER.put(globalPos, now);
                     sendHttpRequest(level, pos);
                 } else {
                     BerdlyHTTP.LOGGER.debug("Transmitter at {} throttled by cooldown ({} ticks remaining)",
@@ -67,7 +68,7 @@ public class DimensionalTransmitterBlock extends Block {
     @Override
     public void onRemove(BlockState state, Level level, BlockPos pos, BlockState newState, boolean isMoving) {
         if (!state.is(newState.getBlock())) {
-            LAST_TRIGGER.remove(pos);
+            LAST_TRIGGER.remove(GlobalPos.of(level.dimension(), pos));
         }
         super.onRemove(state, level, pos, newState, isMoving);
     }
@@ -75,12 +76,8 @@ public class DimensionalTransmitterBlock extends Block {
     private void sendHttpRequest(Level level, BlockPos pos) {
         String url = BerdlyConfig.ENDPOINT_URL.get();
         if (url == null || url.isBlank()) {
-            BerdlyHTTP.LOGGER.warn("Dimensional transmitter at {} activated, but endpoint_url is empty in config.", pos);
+            BerdlyHTTP.LOGGER.warn("Transmitter at {} triggered, but endpoint_url is empty in config.", pos);
             return;
-        }
-
-        if (!url.startsWith("http://") && !url.startsWith("https://")) {
-            url = "https://" + url;
         }
 
         URI uri;
@@ -102,23 +99,24 @@ public class DimensionalTransmitterBlock extends Block {
         } else {
             String payload = "";
             if (BerdlyConfig.SEND_COORDINATES.get()) {
-                payload = String.format(
-                        "{\"x\":%d,\"y\":%d,\"z\":%d,\"dimension\":\"%s\",\"timestamp\":%d}",
-                        pos.getX(), pos.getY(), pos.getZ(),
-                        level.dimension().location().toString(),
-                        System.currentTimeMillis()
-                );
+                JsonObject json = new JsonObject();
+                json.addProperty("x", pos.getX());
+                json.addProperty("y", pos.getY());
+                json.addProperty("z", pos.getZ());
+                json.addProperty("dimension", level.dimension().location().toString());
+                json.addProperty("timestamp", System.currentTimeMillis());
+                payload = json.toString();
                 requestBuilder.header("Content-Type", "application/json");
             }
             requestBuilder.POST(HttpRequest.BodyPublishers.ofString(payload));
         }
 
-        BerdlyHTTP.LOGGER.info("Dimensional transmitter at {} sending {} to {}...", pos, method, uri);
+        BerdlyHTTP.LOGGER.info("Transmitter at {} sending {} to {}...", pos, method, uri);
 
         HTTP_CLIENT.sendAsync(requestBuilder.build(), HttpResponse.BodyHandlers.ofString())
                 .thenAccept(response -> {
                     if (response.statusCode() >= 200 && response.statusCode() < 300) {
-                        BerdlyHTTP.LOGGER.info("Transmitter at {} request succeeded (status {})", pos, response.statusCode());
+                        BerdlyHTTP.LOGGER.info("Transmitter at {} request succeeded ({})", pos, response.statusCode());
                     } else {
                         BerdlyHTTP.LOGGER.warn("Transmitter at {} request returned non-OK status: {}", pos, response.statusCode());
                     }

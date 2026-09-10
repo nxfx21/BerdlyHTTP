@@ -13,26 +13,26 @@ public final class BerdlyConfig {
     static {
         ForgeConfigSpec.Builder builder = new ForgeConfigSpec.Builder();
 
-        builder.comment("BerdlyHTTP Server Configuration").push("general");
+        builder.comment("BerdlyHTTP Configuration").push("general");
 
         ENDPOINT_URL = builder
-                .comment("Target HTTP/HTTPS endpoint URL triggered by the Dimensional Transmitter")
+                .comment("Target URL to ping")
                 .define("endpoint_url", "https://berdsmp.quantumkya.dev/somewhere");
 
         HTTP_METHOD = builder
-                .comment("HTTP method to use (GET or POST)")
+                .comment("HTTP method (GET or POST)")
                 .define("http_method", "POST");
 
         SEND_COORDINATES = builder
-                .comment("Whether to send a JSON payload containing coordinates, dimension, and timestamp (for POST requests)")
+                .comment("Send block position and dimension in POST body")
                 .define("send_coordinates", true);
 
         COOLDOWN_TICKS = builder
-                .comment("Cooldown in game ticks between triggers for a single transmitter (20 ticks = 1 second)")
+                .comment("Cooldown in ticks between triggers (20 ticks = 1s)")
                 .defineInRange("cooldown_ticks", 20, 0, 72000);
 
         REQUEST_TIMEOUT_SECONDS = builder
-                .comment("HTTP request timeout in seconds")
+                .comment("Request timeout in seconds")
                 .defineInRange("request_timeout_seconds", 5, 1, 60);
 
         builder.pop();
