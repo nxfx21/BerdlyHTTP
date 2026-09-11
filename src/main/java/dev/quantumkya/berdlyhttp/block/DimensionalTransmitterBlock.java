@@ -41,7 +41,7 @@ public class DimensionalTransmitterBlock extends Block {
 
     @Override
     public void neighborChanged(BlockState state, Level level, BlockPos pos, Block block, BlockPos fromPos, boolean isMoving) {
-        if (level.isClientSide) return;
+        if (level.isClientSide()) return;
 
         boolean hasSignal = level.hasNeighborSignal(pos);
         boolean isPowered = state.getValue(POWERED);
