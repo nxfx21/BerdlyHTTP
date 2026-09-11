@@ -1,9 +1,15 @@
 {
   "variants": {
-    "powered=false": {
+    "lit=false,powered=false": {
       "model": "berdlyhttp:block/dimensional_transmitter"
     },
-    "powered=true": {
+    "lit=false,powered=true": {
+      "model": "berdlyhttp:block/dimensional_transmitter"
+    },
+    "lit=true,powered=false": {
+      "model": "berdlyhttp:block/dimensional_transmitter_active"
+    },
+    "lit=true,powered=true": {
       "model": "berdlyhttp:block/dimensional_transmitter_active"
     }
   }

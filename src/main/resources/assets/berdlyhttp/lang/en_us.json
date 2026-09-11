@@ -1,0 +1,14 @@
+{
+  "block.berdlyhttp.dimensional_transmitter": "Dimensional Transmitter",
+  "gui.berdlyhttp.transmitter_config.title": "Dimensional Transmitter Configuration",
+  "gui.berdlyhttp.transmitter_config.url": "Endpoint URL:",
+  "gui.berdlyhttp.transmitter_config.method": "Method: ",
+  "gui.berdlyhttp.transmitter_config.cooldown": "Cooldown (ticks):",
+  "gui.berdlyhttp.transmitter_config.coords": "Send Coordinates: ",
+  "gui.berdlyhttp.transmitter_config.save": "Save",
+  "gui.berdlyhttp.transmitter_config.cancel": "Cancel",
+  "command.berdlyhttp.success": "Transmitter at %s updated.",
+  "command.berdlyhttp.default_success": "Default %s updated to: %s",
+  "command.berdlyhttp.reload_success": "BerdlyHTTP configuration reloaded.",
+  "command.berdlyhttp.target_not_found": "You must be looking at a Dimensional Transmitter."
+}

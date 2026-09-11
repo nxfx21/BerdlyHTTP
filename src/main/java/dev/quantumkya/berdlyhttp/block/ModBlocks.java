@@ -22,6 +22,7 @@ public class ModBlocks {
             () -> new DimensionalTransmitterBlock(BlockBehaviour.Properties.of()
                     .strength(5.0F, 6.0F)
                     .sound(SoundType.AMETHYST)
+                    .lightLevel(state -> state.getValue(DimensionalTransmitterBlock.LIT) ? 4 : 0)
                     .requiresCorrectToolForDrops()));
 
     private static <T extends Block> RegistryObject<T> registerBlock(String name, Supplier<T> block) {
