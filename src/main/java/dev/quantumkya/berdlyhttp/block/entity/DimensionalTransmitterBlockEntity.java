@@ -2,6 +2,7 @@ package dev.quantumkya.berdlyhttp.block.entity;
 
 import dev.quantumkya.berdlyhttp.BerdlyConfig;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.Connection;
 import net.minecraft.network.protocol.Packet;
@@ -17,9 +18,23 @@ public class DimensionalTransmitterBlockEntity extends BlockEntity {
     private int cooldownTicks = -1;
     private boolean sendCoordinates = true;
     private boolean hasCustomConfig = false;
+    private int inputMask = 0;
 
     public DimensionalTransmitterBlockEntity(BlockPos pos, BlockState state) {
         super(ModBlockEntities.DIMENSIONAL_TRANSMITTER_BE.get(), pos, state);
+    }
+
+    public int getInputMask() {
+        return this.inputMask;
+    }
+
+    public void setInputMask(int inputMask) {
+        this.inputMask = inputMask;
+        setChanged();
+    }
+
+    public boolean isInputDirection(Direction dir) {
+        return dir != null && (this.inputMask & (1 << dir.get3DDataValue())) != 0;
     }
 
     public String getEndpointUrl() {
@@ -111,6 +126,7 @@ public class DimensionalTransmitterBlockEntity extends BlockEntity {
         this.httpMethod = tag.getString("HttpMethod");
         this.cooldownTicks = tag.contains("CooldownTicks") ? tag.getInt("CooldownTicks") : -1;
         this.sendCoordinates = tag.getBoolean("SendCoordinates");
+        this.inputMask = tag.getInt("InputMask");
     }
 
     @Override
@@ -121,6 +137,7 @@ public class DimensionalTransmitterBlockEntity extends BlockEntity {
         tag.putString("HttpMethod", this.httpMethod);
         tag.putInt("CooldownTicks", this.cooldownTicks);
         tag.putBoolean("SendCoordinates", this.sendCoordinates);
+        tag.putInt("InputMask", this.inputMask);
     }
 
     @Override

@@ -5,10 +5,12 @@ import dev.quantumkya.berdlyhttp.BerdlyConfig;
 import dev.quantumkya.berdlyhttp.BerdlyHTTP;
 import dev.quantumkya.berdlyhttp.block.entity.DimensionalTransmitterBlockEntity;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
 import net.minecraft.core.GlobalPos;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.EntityBlock;
@@ -58,13 +60,68 @@ public class DimensionalTransmitterBlock extends Block implements EntityBlock {
     }
 
     @Override
+    public boolean isSignalSource(BlockState state) {
+        return true;
+    }
+
+    @Override
+    public int getSignal(BlockState state, BlockGetter level, BlockPos pos, Direction side) {
+        if (!state.getValue(POWERED) || side == null) {
+            return 0;
+        }
+        Direction neighborDir = side.getOpposite();
+        BlockEntity be = level.getBlockEntity(pos);
+        if (be instanceof DimensionalTransmitterBlockEntity transmitter) {
+            if (transmitter.isInputDirection(neighborDir)) {
+                return 0;
+            }
+        }
+        return 15;
+    }
+
+    @Override
+    public int getDirectSignal(BlockState state, BlockGetter level, BlockPos pos, Direction side) {
+        return 0;
+    }
+
+    @Override
+    public boolean canConnectRedstone(BlockState state, BlockGetter level, BlockPos pos, Direction direction) {
+        return true;
+    }
+
+    @Override
     public void neighborChanged(BlockState state, Level level, BlockPos pos, Block block, BlockPos fromPos, boolean isMoving) {
         if (level.isClientSide()) return;
 
-        boolean hasSignal = level.hasNeighborSignal(pos);
         boolean wasPowered = state.getValue(POWERED);
+        BlockEntity be = level.getBlockEntity(pos);
+        DimensionalTransmitterBlockEntity transmitter = (be instanceof DimensionalTransmitterBlockEntity t) ? t : null;
+        int currentMask = (transmitter != null) ? transmitter.getInputMask() : 0;
+
+        int newMask = 0;
+        if (wasPowered && currentMask != 0) {
+            for (Direction dir : Direction.values()) {
+                if ((currentMask & (1 << dir.get3DDataValue())) != 0) {
+                    if (level.getSignal(pos.relative(dir), dir) > 0) {
+                        newMask |= (1 << dir.get3DDataValue());
+                    }
+                }
+            }
+        } else {
+            for (Direction dir : Direction.values()) {
+                if (level.getSignal(pos.relative(dir), dir) > 0) {
+                    newMask |= (1 << dir.get3DDataValue());
+                }
+            }
+        }
+
+        boolean hasSignal = newMask != 0;
 
         if (hasSignal != wasPowered) {
+            if (transmitter != null) {
+                transmitter.setInputMask(newMask);
+            }
+
             BlockState newState = state.setValue(POWERED, hasSignal);
             if (hasSignal) {
                 // Secondary T-flip-flop toggle for comparators
@@ -72,7 +129,14 @@ public class DimensionalTransmitterBlock extends Block implements EntityBlock {
                 // Primary function: trigger HTTP request on rising edge
                 triggerHttp(level, pos);
             }
+
             level.setBlock(pos, newState, 3);
+            level.updateNeighborsAt(pos, this);
+        } else if (hasSignal && newMask != currentMask) {
+            if (transmitter != null) {
+                transmitter.setInputMask(newMask);
+                level.updateNeighborsAt(pos, this);
+            }
         }
     }
 
@@ -84,6 +148,17 @@ public class DimensionalTransmitterBlock extends Block implements EntityBlock {
     @Override
     public int getAnalogOutputSignal(BlockState state, Level level, BlockPos pos) {
         return state.getValue(TOGGLED) ? 15 : 0;
+    }
+
+    @Override
+    public void onRemove(BlockState state, Level level, BlockPos pos, BlockState newState, boolean isMoving) {
+        if (!state.is(newState.getBlock())) {
+            if (!level.isClientSide() && state.getValue(POWERED)) {
+                level.updateNeighborsAt(pos, this);
+            }
+            LAST_TRIGGER.remove(GlobalPos.of(level.dimension(), pos));
+            super.onRemove(state, level, pos, newState, isMoving);
+        }
     }
 
     @Override
