@@ -31,7 +31,7 @@ import java.util.concurrent.ConcurrentHashMap;
 
 public class DimensionalTransmitterBlock extends Block implements EntityBlock {
     public static final BooleanProperty POWERED = BlockStateProperties.POWERED;
-    public static final BooleanProperty LIT = BlockStateProperties.LIT;
+    public static final BooleanProperty TOGGLED = BlockStateProperties.LIT;
 
     private static final Map<GlobalPos, Long> LAST_TRIGGER = new ConcurrentHashMap<>();
 
@@ -43,7 +43,7 @@ public class DimensionalTransmitterBlock extends Block implements EntityBlock {
         super(properties);
         this.registerDefaultState(this.stateDefinition.any()
                 .setValue(POWERED, Boolean.FALSE)
-                .setValue(LIT, Boolean.FALSE));
+                .setValue(TOGGLED, Boolean.FALSE));
     }
 
     @Override
@@ -53,7 +53,7 @@ public class DimensionalTransmitterBlock extends Block implements EntityBlock {
 
     @Override
     protected void createBlockStateDefinition(StateDefinition.Builder<Block, BlockState> builder) {
-        builder.add(POWERED, LIT);
+        builder.add(POWERED, TOGGLED);
     }
 
     @Override
@@ -66,8 +66,9 @@ public class DimensionalTransmitterBlock extends Block implements EntityBlock {
         if (hasSignal != wasPowered) {
             BlockState newState = state.setValue(POWERED, hasSignal);
             if (hasSignal) {
-                boolean newLit = !state.getValue(LIT);
-                newState = newState.setValue(LIT, newLit);
+                // Secondary T-flip-flop toggle for comparators
+                newState = newState.setValue(TOGGLED, !state.getValue(TOGGLED));
+                // Primary function: trigger HTTP request on rising edge
                 triggerHttp(level, pos);
             }
             level.setBlock(pos, newState, 3);
@@ -81,7 +82,7 @@ public class DimensionalTransmitterBlock extends Block implements EntityBlock {
 
     @Override
     public int getAnalogOutputSignal(BlockState state, Level level, BlockPos pos) {
-        return state.getValue(LIT) ? 15 : 0;
+        return state.getValue(TOGGLED) ? 15 : 0;
     }
 
     @Override
