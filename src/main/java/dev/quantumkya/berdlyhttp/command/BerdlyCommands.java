@@ -16,6 +16,7 @@ import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.HitResult;
 
+@SuppressWarnings("null")
 public final class BerdlyCommands {
     private BerdlyCommands() {}
 

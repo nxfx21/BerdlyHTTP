@@ -5,6 +5,7 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.level.block.entity.BlockEntity;
 
+@SuppressWarnings("null")
 public final class ClientGuiHelper {
     private ClientGuiHelper() {}
 

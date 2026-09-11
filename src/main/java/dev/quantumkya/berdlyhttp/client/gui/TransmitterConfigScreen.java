@@ -9,6 +9,7 @@ import net.minecraft.network.chat.Component;
 
 import java.util.Locale;
 
+@SuppressWarnings("null")
 public class TransmitterConfigScreen extends Screen {
     private final BlockPos pos;
     private final String initialUrl;

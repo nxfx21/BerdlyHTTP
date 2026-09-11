@@ -10,6 +10,7 @@ import net.minecraft.network.protocol.game.ClientboundBlockEntityDataPacket;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 
+@SuppressWarnings("null")
 public class DimensionalTransmitterBlockEntity extends BlockEntity {
     private String endpointUrl = "";
     private String httpMethod = "";
@@ -96,8 +97,9 @@ public class DimensionalTransmitterBlockEntity extends BlockEntity {
     }
 
     private void syncToClient() {
-        if (level != null && !level.isClientSide()) {
-            level.sendBlockUpdated(worldPosition, getBlockState(), getBlockState(), 3);
+        net.minecraft.world.level.Level lvl = this.level;
+        if (lvl != null && !lvl.isClientSide()) {
+            lvl.sendBlockUpdated(worldPosition, getBlockState(), getBlockState(), 3);
         }
     }
 

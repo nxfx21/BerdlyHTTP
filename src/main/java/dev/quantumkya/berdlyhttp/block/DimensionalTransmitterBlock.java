@@ -29,6 +29,7 @@ import java.time.Duration;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
+@SuppressWarnings({"null", "deprecation"})
 public class DimensionalTransmitterBlock extends Block implements EntityBlock {
     public static final BooleanProperty POWERED = BlockStateProperties.POWERED;
     public static final BooleanProperty TOGGLED = BlockStateProperties.LIT;
